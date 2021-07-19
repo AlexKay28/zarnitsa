@@ -1,9 +1,9 @@
 # zarnitsa
 Zarnitsa package for data augmentation techniques
 
-- Data permutation
+- Internal data augmentation using existed data
+- External data augmentation setting known statistical distributions by yourself
 - NLP augmentation
-- Prior distributions implementation
 
 
 
