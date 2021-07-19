@@ -1,4 +1,4 @@
 from .DataAugmenter import AbstractDataAugmenter
-from .DataAugmenterComb import DataAugmenterComb
+from .DataAugmenterInternally import DataAugmenterInternally
 from .DataAugmenterNLP import DataAugmenterNLP
-from .DataAugmenterDistrib import DataAugmenterDistrib
+from .DataAugmenterExternally import DataAugmenterExternally

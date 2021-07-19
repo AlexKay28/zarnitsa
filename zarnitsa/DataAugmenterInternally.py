@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 from .DataAugmenter import AbstractDataAugmenter
 
-class DataAugmenterComb(AbstractDataAugmenter):
+class DataAugmenterInternally(AbstractDataAugmenter):
 
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs

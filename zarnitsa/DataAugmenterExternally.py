@@ -4,5 +4,5 @@ from sklearn.model_selection import train_test_split
 
 from .DataAugmenter import AbstractDataAugmenter
 
-class DataAugmenterDistrib(AbstractDataAugmenter):
+class DataAugmenterExternally(AbstractDataAugmenter):
     pass
