@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
 from .DataAugmenter import AbstractDataAugmenter
+
 
 class DataAugmenterInternally(AbstractDataAugmenter):
 
@@ -31,11 +31,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         not_to_aug, to_aug = self._prepare_data_to_aug(df, freq=freq)
         for col in df.columns:
             to_aug[col] = augment_column_method[aug_type](to_aug[col], freq=1.0)
-        if return_only_aug:
-            return to_aug
-        else:
-            col = pd.concat([not_to_aug, to_aug])
-            return col
+        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+
 
     def augment_column(self, col: pd.Series, aug_type='normal', freq=0.2, return_only_aug=False) -> pd.Series:
         "Augmetate Serial data. Pandas column"
@@ -46,11 +43,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         }
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         to_aug = augment_column_method[aug_type](to_aug, freq=1.0)
-        if return_only_aug:
-            return to_aug
-        else:
-            col = pd.concat([not_to_aug, to_aug])
-            return col
+        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+
 
     def augment_column_permut(self, col: pd.Series, freq=0.2, return_only_aug=False) -> pd.Series:
         "Augmetate column data using permutations. Pandas column"
@@ -58,11 +52,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         indices_to_permutate = to_aug.index
         to_aug = to_aug.sample(frac=1.0)
         to_aug.index = indices_to_permutate
-        if return_only_aug:
-            return to_aug
-        else:
-            col = pd.concat([not_to_aug, to_aug])
-            return col
+        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+
 
     def augment_column_norm(self, col: pd.Series, freq=0.2, return_only_aug=False) -> pd.Series:
         "Augmetate column data using normal distib. Pandas column"
@@ -71,11 +62,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         to_aug = to_aug.apply(
             lambda value: np.random.normal(value, column_std)
         )
-        if return_only_aug:
-            return to_aug
-        else:
-            col = pd.concat([not_to_aug, to_aug])
-            return col
+        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+
 
     def augment_column_uniform(self, col: pd.Series, freq=0.2, n_sigm=3, return_only_aug=False) -> pd.Series:
         "Augmetate column data using uniform distib. Pandas column"
@@ -84,8 +72,4 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         to_aug = to_aug.apply(
             lambda value: np.random.uniform(value - n_sigm*column_std, value + n_sigm*column_std)
         )
-        if return_only_aug:
-            return to_aug
-        else:
-            col = pd.concat([not_to_aug, to_aug])
-            return col
+        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
