@@ -2,8 +2,9 @@
   <img src="https://user-images.githubusercontent.com/55444371/126209354-44068bb7-81aa-49a5-af4e-71b8c2475386.png" />
 </p>
 
-[![licence](https://img.shields.io/github/license/dsfsi/textaugment.svg?maxAge=3600)](https://github.com/dsfsi/textaugment/blob/master/LICENCE)
+![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Wheel](https://img.shields.io/pypi/wheel/textaugment.svg?maxAge=3600)](https://pypi.python.org/pypi/textaugment)  [![python](https://img.shields.io/pypi/pyversions/textaugment.svg?maxAge=3600)](https://pypi.org/project/textaugment/)
 # zarnitsa package
+
 Zarnitsa package for data augmentation techniques.
 
 - Internal data augmentation using existed data
