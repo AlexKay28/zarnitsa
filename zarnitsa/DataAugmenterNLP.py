@@ -11,7 +11,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
     __class_local_path = os.path.dirname(os.path.realpath(__file__))
 
-    self.aug_wdnt = naw.SynonymAug(aug_src='wordnet')
+    __aug_wdnt = None
+    __aug_ppdb = None
 
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
@@ -27,32 +28,48 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         elif freq == 0:
             return data, data.sample(0)
 
-    def augment_dataframe(self, df: pd.DataFrame, aug_type='normal', freq=0.2, return_only_aug=False) -> pd.DataFrame:
+    def augment_dataframe(self,
+                          df: pd.DataFrame,
+                          freq=0.2,
+                          return_only_aug=False,
+                          aug_type='deleting',
+                          reps=1,
+                          min_words=1,
+                          window_size=3,
+                          columns=None) -> pd.DataFrame:
         "Augmetate dataframe data. Pandas dataframe"
-        augment_column_method = {
-            "wordnet":      self.augment_column_wordnet,
-            "ppdb":         self.augment_column_ppdb,
-            "embedding":    self.augment_column_word_emb,
-            "deleting":     self.augment_column_del,
-            "permutations": self.augment_column_permut,
-        }
         not_to_aug, to_aug = self._prepare_data_to_aug(df, freq=freq)
-        for col in df.columns:
-            to_aug[col] = augment_column_method[aug_type](to_aug[col], freq=1.0)
+        columns = columns if columns else df.columns
+        for col in columns:
+            to_aug[col] = self.augment_column(
+                to_aug[col], freq=1.0, return_only_aug=return_only_aug, aug_type=aug_type,
+                reps=reps, min_words=min_words, window_size=window_size
+            )
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
 
-    def augment_column(self, col: pd.Series, aug_type='normal', freq=0.2, return_only_aug=False) -> pd.Series:
+    def augment_column(self,
+                       col: pd.Series,
+                       freq=0.2,
+                       return_only_aug=False,
+                       aug_type='deleting',
+                       reps=1,
+                       min_words=1,
+                       window_size=3) -> pd.Series:
         "Augmetate Serial data. Pandas column"
-        augment_column_method = {
-            "wordnet":      self.augment_column_wordnet,
-            "ppdb":         self.augment_column_ppdb,
-            "embedding":    self.augment_column_word_emb,
-            "deleting":     self.augment_column_del,
-            "permutations": self.augment_column_permut,
-        }
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-        to_aug = augment_column_method[aug_type](to_aug, freq=1.0)
+        if aug_type == 'wordnet':
+            to_aug = to_aug.apply(lambda text: self.augment_column_wordnet(text))
+        elif aug_type == 'ppdb':
+            to_aug = to_aug.apply(lambda text: self.augment_column_ppdb(text))
+        elif aug_type == 'embedding':
+            to_aug = to_aug.apply(lambda text: self.augment_column_word_emb(text, words_and_vectors, reps=reps))
+        elif aug_type == 'deleting':
+            to_aug = to_aug.apply(lambda text: self.augment_column_del(text, reps=reps, min_words=min_words))
+        elif aug_type == 'permutations':
+            to_aug = to_aug.apply(lambda text: self.augment_column_permut(text, reps=reps, window_size=window_size))
+        else:
+            raise KeyError(f"Unknown type of NLP augmentation! [{aug_type}]")
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def _check_synset(self, name):
@@ -60,111 +77,71 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         if name == 'ppdb':
             my_file = os.path.join(self.__class_local_path, 'internal_data', 'ppdb-2.0-tldr')
             wget.download("http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz")
-        elif:
+        else:
             raise KeyError(f"Synset {name} is unknown! load manually or fix the name")
 
-    def augment_column_wordnet(self, col: pd.Series, freq=0.2, return_only_aug=False) -> pd.Series:
+    def augment_column_wordnet(self, text: str) -> str:
         "Augmetate column data using wordnet synset. Pandas column"
-        not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
+        if not self.__aug_wdnt:
+            print('Load WordNet synset')
+            self.__aug_wdnt = naw.SynonymAug(aug_src='wordnet')
+        text = self.__aug_wdnt.augment(text)
+        return text
 
-        if not self.aug_wdnt:
-            self.aug_wdnt = naw.SynonymAug(aug_src='wordnet')
-
-        to_aug = to_aug.progress_apply(
-            lambda text: self.aug_wdnt.augment(text)
-        )
-
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
-
-    def augment_column_ppdb(self, col: pd.Series, freq=0.2, return_only_aug=False) -> pd.Series:
+    def augment_column_ppdb(self, text: str) -> str:
         "Augmetate column data using ppdb synset. Pandas column"
-        not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-
-        if not self.aug_wdnt:
+        if not self.__aug_ppdb:
+            print('Load PPDB synset')
             self._check_synset('ppdb')
-            self.aug_ppdb = naw.SynonymAug(
+            self.__aug_ppdb = naw.SynonymAug(
                 aug_src='ppdb', model_path=self.__class_local_path + '/internal_data/ppdb-2.0-tldr'
             )
+        text = self.__aug_ppdb.augment(text)
+        return text
 
-        to_aug = to_aug.progress_apply(
-            lambda text: self.aug_ppdb.augment(text)
-        )
-
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
-
-
-    def augment_column_word_emb(self, col: pd.Series, freq=0.2, return_only_aug=False, reps=1,, words_and_vectors=None) -> pd.Series:
+    def augment_column_word_emb(self, text: str, words_and_vectors: dict, reps=1) -> str:
         "Augmetate column data using embeddings. Pandas column"
-        not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-
         if type(words_and_vectors) != dict:
             raise "Var words_and_vectors must be dict!"
         elif len(words_and_vectors.keys()) == 0:
             raise "Var words_and_vectors is empty!"
         elif words_and_vectors is None:
             raise "Define words_and_vectors variable!"
-
-        def replace_word_using_embeddings(text):
-            text = text.split()
-            text_len = len(text)
-            for _ in range(reps):
-                random_word_idx = np.random.choice(text_len)
-                random_word     = text[random_word_idx]
-                random_word_vec = words_and_vectors[random_word]
-                del words_and_vectors[random_word]
-                df_of_vecs = pd.DataFrame({
-                    "word" : words_and_vectors.keys(),
-                    "vec"  : words_and_vectors.values()
-                })
-                df_of_vecs['vec'].apply(lambda vec: sum(vec - random_word_vec), inplace=True)
-                new_word = df_of_vecs.sort_values('vec', inplace=True).loc[0, 'word']
-                text[random_word_idx] = choosed_word
-                words_and_vectors[random_word] = random_word_vec
-
-        to_aug = to_aug.apply(
-            lambda text: replace_word_using_embeddings(text)
-        )
-
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+        text = text.split()
+        text_len = len(text)
+        for _ in range(reps):
+            random_word_idx = np.random.choice(text_len)
+            random_word     = text[random_word_idx]
+            random_word_vec = words_and_vectors[random_word]
+            del words_and_vectors[random_word]
+            df_of_vecs = pd.DataFrame({
+                "word" : words_and_vectors.keys(),
+                "vec"  : words_and_vectors.values()
+            })
+            df_of_vecs['vec'].apply(lambda vec: sum(vec - random_word_vec), inplace=True)
+            new_word = df_of_vecs.sort_values('vec', inplace=True).loc[0, 'word']
+            text[random_word_idx] = choosed_word
+            words_and_vectors[random_word] = random_word_vec
+        return ' '.join(text)
 
 
-    def augment_column_del(self, col: pd.Series, freq=0.2, return_only_aug=False, reps=1, min_words=5) -> pd.Series:
+    def augment_column_del(self, text: str, reps=1, min_words=1) -> str:
         "Augmetate column data using deleting. Pandas column"
-        not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-
-        def delete_random_word(text):
-            text = text.split()
+        text = text.split()
+        for _ in range(reps):
             text_len = len(text)
-            for _ in range(reps):
-                if text_len < min_words:
-                    break
-                random_word_idx = np.random.randint(min_words, text_len)
-                del text[random_word_idx]
-            return ' '.join(text)
+            if text_len <= min_words: break
+            random_word_idx = np.random.randint(min_words-1, text_len-1)
+            del text[random_word_idx]
+        return ' '.join(text)
 
-        to_aug = to_aug.apply(
-            lambda text: delete_random_word(text)
-        )
-
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
-
-
-    def augment_column_permut(self, col: pd.Series, freq=0.2, return_only_aug=False, reps=1) -> pd.Series:
+    def augment_column_permut(self, text: str, reps=1, window_size=3) -> str:
         "Augmetate column data using permutations. Pandas column"
-        not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-
-        def permute_text(text):
-            text = text.split()
-            text_len = len(text)
-            for _ in range(reps):
-                window_start = np.random.choice(max(0, text_len-window_size))
-                window = text[window_start:window_start + window_size]
-                first, second = np.random.choice(window_size, size=2, replace=False)
-                text[first], text[second] = text[second], text[first]
-            return ' '.join(text)
-
-        to_aug = to_aug.apply(
-            lambda text: permute_text(text, reps)
-        )
-
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+        text = text.split()
+        text_len = len(text)
+        for _ in range(reps):
+            window_start = np.random.choice(max(0, text_len-window_size))
+            window = text[window_start:window_start + window_size]
+            first, second = np.random.choice(window_size, size=2, replace=False)
+            text[first], text[second] = text[second], text[first]
+        return ' '.join(text)
