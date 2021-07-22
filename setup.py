@@ -17,5 +17,8 @@ setup(
     url='https://github.com/AlexKay28/zarnitsa',
     author='Kaigorodov Alexander',
     author_email='kaygorodo2305@gmail.com',
+    download_url='https://pypi.org/project/zarnitsa/',
     install_requires=install_requires,
+    keywords=['augmentation', 'NLP', 'distributions'],
+    include_package_data=True
 )
