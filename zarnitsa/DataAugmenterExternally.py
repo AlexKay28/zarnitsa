@@ -32,6 +32,7 @@ class DataAugmenterExternally(AbstractDataAugmenter):
         return col
 
     def augment_distrib_random(self, aug_type='normal'. size=None, **kwargs):
+        "Return float or array depends on needed size. If size is 1 - returns array of size 1"
         if aug_type == "beta":
             return np.random.beta(a=kwargs['a'], b=kwargs['b'], size=size),
         elif aug_type == "binomial":
