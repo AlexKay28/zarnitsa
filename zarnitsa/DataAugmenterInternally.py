@@ -22,7 +22,6 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             to_aug[col] = augment_column_method[aug_type](to_aug[col], freq=1.0)
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
-
     def augment_column(self, col: pd.Series, aug_type='normal', freq=0.2, return_only_aug=False) -> pd.Series:
         "Augmetate Serial data. Pandas column"
         augment_column_method = {
@@ -61,7 +60,6 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             lambda value: np.random.normal(value, column_std)
         )
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
-
 
     def augment_column_uniform(self, col: pd.Series, freq=0.2, n_sigm=3, return_only_aug=False) -> pd.Series:
         "Augmetate column data using uniform distib. Pandas column"

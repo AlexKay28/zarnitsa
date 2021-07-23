@@ -11,7 +11,6 @@ from .DataAugmenter import AbstractDataAugmenter
 class DataAugmenterNLP(AbstractDataAugmenter):
 
     __class_local_path = os.path.dirname(os.path.realpath(__file__))
-
     __aug_wdnt = None
     __aug_ppdb = None
 
@@ -47,7 +46,6 @@ class DataAugmenterNLP(AbstractDataAugmenter):
                 reps=reps, min_words=min_words, window_size=window_size
             )
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
-
 
     def augment_column(self,
                        col: pd.Series,
@@ -124,7 +122,6 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             text[random_word_idx] = choosed_word
             words_and_vectors[random_word] = random_word_vec
         return ' '.join(text)
-
 
     def augment_column_del(self, text: str, reps=1, min_words=1) -> str:
         "Augmetate column data using deleting."
