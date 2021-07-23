@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Wheel](https://img.shields.io/pypi/wheel/textaugment.svg?maxAge=3600)](https://pypi.python.org/pypi/textaugment)  [![python](https://img.shields.io/pypi/pyversions/textaugment.svg?maxAge=3600)](https://pypi.org/project/textaugment/)
 # zarnitsa package
 
-Zarnitsa package for data augmentation techniques.
+Zarnitsa package with data augmentation tools.
 
 - Internal data augmentation using existed data
 - External data augmentation setting known statistical distributions by yourself
