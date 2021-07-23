@@ -82,7 +82,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             raise KeyError(f"Synset {name} is unknown! load manually or fix the name")
 
     def augment_column_wordnet(self, text: str) -> str:
-        "Augmetate column data using wordnet synset. Pandas column"
+        "Augmetate column data using wordnet synset."
         if not self.__aug_wdnt:
             print('Load WordNet synset')
             self.__aug_wdnt = naw.SynonymAug(aug_src='wordnet')
@@ -90,7 +90,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         return text
 
     def augment_column_ppdb(self, text: str) -> str:
-        "Augmetate column data using ppdb synset. Pandas column"
+        "Augmetate column data using ppdb synset."
         if not self.__aug_ppdb:
             print('Load PPDB synset')
             self._check_synset('ppdb')
@@ -101,7 +101,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         return text
 
     def augment_column_word_emb(self, text: str, words_and_vectors: dict, reps=1) -> str:
-        "Augmetate column data using embeddings. Pandas column"
+        "Augmetate column data using embeddings."
         if type(words_and_vectors) != dict:
             raise "Var words_and_vectors must be dict!"
         elif len(words_and_vectors.keys()) == 0:
@@ -127,7 +127,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
 
     def augment_column_del(self, text: str, reps=1, min_words=1) -> str:
-        "Augmetate column data using deleting. Pandas column"
+        "Augmetate column data using deleting."
         text = text.split()
         for _ in range(reps):
             text_len = len(text)
@@ -137,7 +137,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         return ' '.join(text)
 
     def augment_column_permut(self, text: str, reps=1, window_size=3) -> str:
-        "Augmetate column data using permutations. Pandas column"
+        "Augmetate column data using permutations."
         text = text.split()
         text_len = len(text)
         for _ in range(reps):
