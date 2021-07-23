@@ -12,7 +12,7 @@ Zarnitsa package for data augmentation techniques.
 - NLP augmentation
 
 
-## Principal cheme of project now
+## Principal scheme of project (currently)
 
 ![Screenshot_20210722_232750](https://user-images.githubusercontent.com/55444371/126705231-3a052e84-6a9c-4c1a-a772-5caa8c2e7c4b.png)
 
