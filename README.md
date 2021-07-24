@@ -108,7 +108,7 @@ having prior knowlege about it
 >>> serial_new.hist(bins=100)
 ```
 ![Screenshot_20210724_133404](https://user-images.githubusercontent.com/55444371/126865837-980e022b-27df-4e7e-9c7b-57c5a094e07c.png)
-![Uploading Screenshot_20210724_133433.png…]()
+![Screenshot_20210724_133433](https://user-images.githubusercontent.com/55444371/126865890-61e59e9b-8170-4202-8db8-e17fef1e50fc.png)
 
 ```
 >>> size=50
