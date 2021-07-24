@@ -13,8 +13,8 @@ Zarnitsa package with data augmentation tools.
 
 
 ## Principal scheme of project (currently)
+![Screenshot_20210724_134741](https://user-images.githubusercontent.com/55444371/126866166-83e64b99-1fd8-4467-b6c3-ee8123fe839f.png)
 
-![Screenshot_20210722_232750](https://user-images.githubusercontent.com/55444371/126705231-3a052e84-6a9c-4c1a-a772-5caa8c2e7c4b.png)
 
 ## Requirements
 - Python3
