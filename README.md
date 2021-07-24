@@ -122,5 +122,5 @@ having prior knowlege about it
 >>> df.plot()
 >>> daug.augment_dataframe(df, aug_type='normal', loc=0, scale=1).plot()
 ```
-![Screenshot_20210724_133525](https://user-images.githubusercontent.com/55444371/126865878-56d9766b-5925-43a0-bb29-e83dc5331455.png)
+![Screenshot_20210724_133635](https://user-images.githubusercontent.com/55444371/126865904-82d2f9e1-d98d-48ff-8fd0-180ad021dadd.png)
 
