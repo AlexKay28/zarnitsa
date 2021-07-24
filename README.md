@@ -95,6 +95,7 @@ This is type of augmentation which you may use in case of working with textual i
 This is type of augmentation which you may use in case of working with distribution modeling
 having prior knowlege about it
 
+_Doing df[...] = np.nan we imitate data sparsness or misses which we try to fill up using augmentations
 ```
 >>> size = 500
 >>> serial_was = pd.Series(daug.augment_distrib_random(aug_type='normal', loc=0, scale=1, size=size))
