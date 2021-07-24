@@ -95,5 +95,32 @@ This is type of augmentation which you may use in case of working with textual i
 This is type of augmentation which you may use in case of working with distribution modeling
 having prior knowlege about it
 
-_Will be soon..._
+```
+>>> size = 500
+>>> serial_was = pd.Series(daug.augment_distrib_random(aug_type='normal', loc=0, scale=1, size=size))
+>>> serial_new = copy(serial_was)![Screenshot_20210724_133433](https://user-images.githubusercontent.com/55444371/126865853-2e09b4dd-f864-43d8-9e63-741c3862d153.png)
+
+>>> serial_new.loc[serial_new.sample(100).index] = None
+>>> serial_new = daug.augment_column(serial_new, aug_type='normal', loc=0, scale=1)
+
+>>> plt.figure(figsize=(12, 8))
+>>> serial_was.hist(bins=100)
+>>> serial_new.hist(bins=100)
+```
+![Screenshot_20210724_133404](https://user-images.githubusercontent.com/55444371/126865837-980e022b-27df-4e7e-9c7b-57c5a094e07c.png)
+![Uploading Screenshot_20210724_133433.png…]()
+
+```
+>>> size=50
+>>> df = pd.DataFrame({
+>>>     'data1': daug.augment_distrib_random(aug_type='normal', loc=0, scale=1, size=size),
+>>>     'data2': daug.augment_distrib_random(aug_type='normal', loc=0, scale=1, size=size),
+>>> })
+>>> for col in df.columns:
+>>>     df[col].loc[df[col].sample(10).index] = None
+>>> plt.figure(figsize=(12, 8))
+>>> df.plot()
+>>> daug.augment_dataframe(df, aug_type='normal', loc=0, scale=1).plot()
+```
+![Screenshot_20210724_133525](https://user-images.githubusercontent.com/55444371/126865878-56d9766b-5925-43a0-bb29-e83dc5331455.png)
 
