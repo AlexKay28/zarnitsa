@@ -32,7 +32,6 @@ pip install zarnitsa
 Or using actual github repo:
 ```
 pip install git+https://github.com/AlexKay28/zarnitsa
-
 ```
 
 ## Usage
