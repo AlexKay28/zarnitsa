@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from typing import Tuple
 
@@ -110,9 +111,12 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             my_file = os.path.join(
                 self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
             )  # todo: defined but not used
-            wget.download(
-                "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz"
-            )
+            if not os.path.exists(my_file):
+                wget.download(
+                    "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz",
+                    out=os.path.join(self.__class_local_path, "internal_data/")
+                )
+                subprocess.run(["gz", my_file])
         else:
             raise KeyError(
                 f"Synset {name} is unknown! Load manually or fix the name"
@@ -191,10 +195,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         text_len = len(text)
         for _ in range(reps):
             window_start = np.random.choice(max(0, text_len - window_size))
-            window = text[
-                window_start : (window_start + window_size)
-            ]  # todo: defined but not used
-            first, second = np.random.choice(
+            first, second = window_start + np.random.choice(
                 window_size, size=2, replace=False
             )
             text[first], text[second] = text[second], text[first]
