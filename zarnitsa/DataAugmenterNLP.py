@@ -3,6 +3,7 @@ import os
 from typing import Tuple
 
 import wget
+import spacy
 import numpy as np
 import pandas as pd
 import nlpaug.augmenter.word as naw
@@ -21,9 +22,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
 
-    def _prepare_data_to_aug(
-        self, data, freq=0.2
-    ) -> Tuple[pd.Series, pd.Series]:
+    def _prepare_data_to_aug(self, data, freq=0.2) -> Tuple[pd.Series, pd.Series]:
         """Get part of data. Not augment all of it excep case freq=1.0"""
         data = (
             pd.Series(data)
@@ -70,33 +69,36 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         freq=0.2,
         return_only_aug=False,
         aug_type="deleting",
+        embeddings_name="en_core_web_md",
+        nlp=None,
         reps=1,
+        topn=5,
         min_words=1,
         window_size=3,
     ) -> pd.Series:
         """Augment Serial data. Pandas column"""
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         if aug_type == "wordnet":
-            to_aug = to_aug.apply(
-                lambda text: self.augment_column_wordnet(text)
-            )
+            to_aug = to_aug.apply(lambda text: self.augment_wordnet(text))
         elif aug_type == "ppdb":
-            to_aug = to_aug.apply(lambda text: self.augment_column_ppdb(text))
-        # elif aug_type == "embedding":
-        #     to_aug = to_aug.apply(
-        #         lambda text: self.augment_column_word_emb(
-        #             text, words_and_vectors, reps=reps #  todo: words_and_vectors used but not defined
-        #         )
-        #     )
+            to_aug = to_aug.apply(lambda text: self.augment_ppdb(text))
+        elif aug_type == "embedding":
+            to_aug = to_aug.apply(
+                lambda text: self.augment_word_emb(
+                    text,
+                    vocab_name=embeddings_name,
+                    nlp=nlp,
+                    reps=reps,
+                    topn=topn,
+                )
+            )
         elif aug_type == "deleting":
             to_aug = to_aug.apply(
-                lambda text: self.augment_column_del(
-                    text, reps=reps, min_words=min_words
-                )
+                lambda text: self.augment_del(text, reps=reps, min_words=min_words)
             )
         elif aug_type == "permutations":
             to_aug = to_aug.apply(
-                lambda text: self.augment_column_permut(
+                lambda text: self.augment_permut(
                     text, reps=reps, window_size=window_size
                 )
             )
@@ -110,15 +112,11 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             my_file = os.path.join(
                 self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
             )  # todo: defined but not used
-            wget.download(
-                "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz"
-            )
+            wget.download("http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz")
         else:
-            raise KeyError(
-                f"Synset {name} is unknown! Load manually or fix the name"
-            )
+            raise KeyError(f"Synset {name} is unknown! Load manually or fix the name")
 
-    def augment_column_wordnet(self, text: str) -> str:
+    def augment_wordnet(self, text: str) -> str:
         """Augment column data using wordnet synset."""
         if not self.__aug_wdnt:
             print("Load WordNet synset")
@@ -126,54 +124,68 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         text = self.__aug_wdnt.augment(text)
         return text
 
-    def augment_column_ppdb(self, text: str) -> str:
+    def augment_ppdb(self, text: str) -> str:
         """Augment column data using ppdb synset."""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
-                model_path=self.__class_local_path
-                + "/internal_data/ppdb-2.0-tldr",
+                model_path=self.__class_local_path + "/internal_data/ppdb-2.0-tldr",
             )
         text = self.__aug_ppdb.augment(text)
         return text
 
     @staticmethod
-    def augment_column_word_emb(
-        text: str, words_and_vectors: dict, reps=1
+    def augment_word_emb(
+        text: str,
+        vocab_name=None,
+        nlp=None,
+        reps=1,
+        topn=5,
     ) -> str:
         """Augment column data using embeddings."""
-        if not isinstance(words_and_vectors, dict):
-            raise TypeError("Var words_and_vectors must be dict!")
-        elif not words_and_vectors:
-            raise ValueError("Var words_and_vectors is empty!")
+        if not nlp:
+            if not vocab_name:
+                print("Use spacy en_core_web_sm vocab!")
+                nlp = spacy.load("en_core_web_md")
+            else:
+                nlp = spacy.load(vocab_name)
+
+        def get_most_similar(word, topn=topn):
+            """Get topn words for defined word"""
+            word = nlp.vocab[str(word)]
+            queries = [
+                w
+                for w in word.vocab
+                if w.is_lower == word.is_lower
+                and w.prob >= -15
+                and np.count_nonzero(w.vector)
+            ]
+            by_similarity = sorted(
+                queries, key=lambda w: word.similarity(w), reverse=True
+            )
+            return [
+                w.lower_.capitalize()
+                if not word.lower_.islower() and not word.lower_.isupper()
+                else w.lower_
+                if word.islower()
+                else word.lower_.upper()
+                for w in by_similarity[: topn + 1]
+                if w.lower_ != word.lower_
+            ]
 
         text = text.split()
         text_len = len(text)
         for _ in range(reps):
             random_word_idx = np.random.choice(text_len)
             random_word = text[random_word_idx]
-            random_word_vec = words_and_vectors[random_word]
-            del words_and_vectors[random_word]
-            df_of_vecs = pd.DataFrame(
-                {
-                    "word": words_and_vectors.keys(),
-                    "vec": words_and_vectors.values(),
-                }
-            )
-            df_of_vecs["vec"].apply(
-                lambda vec: sum(vec - random_word_vec), inplace=True
-            )
-            chosen_word = df_of_vecs.sort_values("vec", inplace=True).loc[
-                0, "word"
-            ]
-            text[random_word_idx] = chosen_word
-            words_and_vectors[random_word] = random_word_vec
+            random_word_similar = get_most_similar(random_word)
+            text[random_word_idx] = np.random.choice(random_word_similar)
         return " ".join(text)
 
     @staticmethod
-    def augment_column_del(text: str, reps=1, min_words=1) -> str:
+    def augment_del(text: str, reps=1, min_words=1) -> str:
         """Augment column data using deleting."""
         text = text.split()
         for _ in range(reps):
@@ -185,7 +197,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         return " ".join(text)
 
     @staticmethod
-    def augment_column_permut(text: str, reps=1, window_size=3) -> str:
+    def augment_permut(text: str, reps=1, window_size=3) -> str:
         """Augment column data using permutations."""
         text = text.split()
         text_len = len(text)
