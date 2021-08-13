@@ -159,7 +159,6 @@ class DataAugmenterNLP(AbstractDataAugmenter):
                 w
                 for w in word.vocab
                 if w.is_lower == word.is_lower
-                and w.prob >= -15
                 and np.count_nonzero(w.vector)
             ]
             by_similarity = sorted(
