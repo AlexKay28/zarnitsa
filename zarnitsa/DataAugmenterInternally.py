@@ -25,7 +25,9 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             to_aug[col] = augment_column_method[aug_type](to_aug[col], **kwargs)
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
-    def augment_column(self, col: pd.Series, aug_type="permutations", **kwargs) -> pd.Series:
+    def augment_column(
+        self, col: pd.Series, aug_type="permutations", **kwargs
+    ) -> pd.Series:
         """Augment Serial data. Pandas column"""
         augment_column_method = {
             "normal": self.augment_column_norm,
@@ -38,8 +40,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     def _prepare_data_to_aug(self, data, freq=0.2) -> Tuple[pd.Series, pd.Series]:
         """
         Get part of data. Not augment all of it excep case freq=1.0
-        params: data: iterable data or pd.Series object
-        params: freq: part of the data which will be the base for augmentation
+        param: data: iterable data or pd.Series object
+        param: freq: part of the data which will be the base for augmentation
         """
         data = pd.Series(data) if not isinstance(data, pd.Series) else data
         if freq < 1:
@@ -55,10 +57,10 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     ) -> pd.Series:
         """
         Augment column data using permutations. Pandas column
-        params: col: pandas series object
-        params: n_to_aug: defined number of augmented examples
-        params: freq: part of the data which will be the base for augmentation
-        params: return_only_aug: ask return only augmented data
+        param: col: pandas series object
+        param: n_to_aug: defined number of augmented examples
+        param: freq: part of the data which will be the base for augmentation
+        param: return_only_aug: ask return only augmented data
         """
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         indices_to_permute = to_aug.index
@@ -74,10 +76,10 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     ) -> pd.Series:
         """
         Augment column data using normal distribution. Pandas column
-        params: col: pandas series object
-        params: n_to_aug: defined number of augmented examples
-        params: freq: part of the data which will be the base for augmentation
-        params: return_only_aug: ask return only augmented data
+        param: col: pandas series object
+        param: n_to_aug: defined number of augmented examples
+        param: freq: part of the data which will be the base for augmentation
+        param: return_only_aug: ask return only augmented data
         """
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         column_std = col.std()
@@ -92,11 +94,11 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     ) -> pd.Series:
         """
         Augment column data using uniform distribution. Pandas column
-        params: col: pandas series object
-        params: n_to_aug: defined number of augmented examples
-        params: freq: part of the data which will be the base for augmentation
-        params: n_sigm: the size of std and terms of sigma value
-        params: return_only_aug: ask return only augmented data
+        param: col: pandas series object
+        param: n_to_aug: defined number of augmented examples
+        param: freq: part of the data which will be the base for augmentation
+        param: n_sigm: the size of std and terms of sigma value
+        param: return_only_aug: ask return only augmented data
         """
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         column_std = col.std()
