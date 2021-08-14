@@ -1,12 +1,12 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    "numpy",  # numpy==1.18.5
-    "pandas",  # pandas==1.1.5
-    "scikit-learn",  # scikit-learn==0.24.1
-    "nlpaug",  # nlpaug==1.1.3
-    "wget",  # wget==3.2
-    "spacy",  # spacy==3.0.5
+    "numpy==1.18.5",
+    "pandas==1.1.5",
+    "scikit-learn==0.24.1",
+    "nlpaug==1.1.3",
+    "wget==3.2",
+    "spacy==3.0.5",
 ]
 
 setup(
