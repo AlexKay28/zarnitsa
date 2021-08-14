@@ -129,9 +129,10 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
+            ppdb_file_path = os.path.join(self.__class_local_path, "internal_data", "ppdb-2.0-tldr")
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
-                model_path=self.__class_local_path + "/internal_data/ppdb-2.0-tldr",
+                model_path=ppdb_file_path,
             )
         text = self.__aug_ppdb.augment(text)
         return text
@@ -158,8 +159,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             queries = [
                 w
                 for w in word.vocab
-                if w.is_lower == word.is_lower
-                and np.count_nonzero(w.vector)
+                if w.is_lower == word.is_lower and np.count_nonzero(w.vector)
             ]
             by_similarity = sorted(
                 queries, key=lambda w: word.similarity(w), reverse=True
