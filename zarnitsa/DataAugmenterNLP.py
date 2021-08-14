@@ -129,7 +129,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
-            ppdb_file_path = os.path.join(self.__class_local_path, "internal_data", "ppdb-2.0-tldr")
+            ppdb_file_path = os.path.join(
+                self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
+            )
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
                 model_path=ppdb_file_path,
@@ -164,15 +166,24 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             by_similarity = sorted(
                 queries, key=lambda w: word.similarity(w), reverse=True
             )
-            return [
-                w.lower_.capitalize()
-                if not word.lower_.islower() and not word.lower_.isupper()
-                else w.lower_
-                if word.islower()
-                else word.lower_.upper()
-                for w in by_similarity[: topn + 1]
-                if w.lower_ != word.lower_
-            ]
+
+            # get candidates and with the same word shape
+            candidates = []
+            for w in by_similarity[: topn + 1]:
+                if w.lower_ == word.lower_:
+                    # skip the same word
+                    continue
+                if not word.lower_.islower() and not word.lower_.isupper():
+                    # word should look like "Word"
+                    candidates.append(w.lower_.capitalize())
+                else:
+                    if word.islower():
+                        # word should look like "word"
+                        candidates.append(w.lower_)
+                    else:
+                        # word should look like "WORD"
+                        candidates.append(word.lower_.upper())
+            return candidates
 
         text = text.split()
         text_len = len(text)
