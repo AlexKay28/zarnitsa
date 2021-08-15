@@ -12,8 +12,17 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
 
-    def augment_dataframe(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
-        """Augment dataframe data. Pandas dataframe"""
+    def augment_dataframe(
+        self, df: pd.DataFrame, aug_type="permutations", **kwargs
+    ) -> pd.DataFrame:
+        """
+        Augment dataframe data. Pandas dataframe
+        param: aug_type: type of augmentation approach
+        param: col: pandas series object
+        param: n_to_aug: defined number of augmented examples
+        param: freq: part of the data which will be the base for augmentation
+        param: return_only_aug: ask return only augmented data
+        """
         augment_column_method = {
             "normal": self.augment_column_norm,
             "uniform": self.augment_column_uniform,
@@ -28,7 +37,14 @@ class DataAugmenterInternally(AbstractDataAugmenter):
     def augment_column(
         self, col: pd.Series, aug_type="permutations", **kwargs
     ) -> pd.Series:
-        """Augment Serial data. Pandas column"""
+        """
+        Augment Serial data. Pandas column
+        param: aug_type: type of augmentation approach
+        param: col: pandas series object
+        param: n_to_aug: defined number of augmented examples
+        param: freq: part of the data which will be the base for augmentation
+        param: return_only_aug: ask return only augmented data
+        """
         augment_column_method = {
             "normal": self.augment_column_norm,
             "uniform": self.augment_column_uniform,
