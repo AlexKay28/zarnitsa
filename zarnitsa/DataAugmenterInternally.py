@@ -21,6 +21,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: col: pandas series object
         param: n_to_aug: defined number of augmented examples
         param: freq: part of the data which will be the base for augmentation
+        param: n_sigm: the size of std and terms of sigma value
         param: return_only_aug: ask return only augmented data
         """
         augment_column_method = {
@@ -43,6 +44,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: col: pandas series object
         param: n_to_aug: defined number of augmented examples
         param: freq: part of the data which will be the base for augmentation
+        param: n_sigm: the size of std and terms of sigma value
         param: return_only_aug: ask return only augmented data
         """
         augment_column_method = {
@@ -88,18 +90,21 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def augment_column_norm(
-        self, col: pd.Series, n_to_aug=None, freq=0.2, return_only_aug=False
+        self, col: pd.Series, n_to_aug=None, freq=0.2, n_sigm=3, return_only_aug=False
     ) -> pd.Series:
         """
         Augment column data using normal distribution. Pandas column
         param: col: pandas series object
         param: n_to_aug: defined number of augmented examples
         param: freq: part of the data which will be the base for augmentation
+        param: n_sigm: the size of std and terms of sigma value
         param: return_only_aug: ask return only augmented data
         """
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         column_std = col.std()
-        to_aug = to_aug.apply(lambda value: np.random.normal(value, column_std))
+        to_aug = to_aug.apply(
+            lambda value: np.random.normal(value, n_sigm * column_std)
+        )
         if n_to_aug:
             n_to_aug = n_to_aug if n_to_aug < to_aug.shape[0] else to_aug.shape[0]
             to_aug = to_aug.sample(n_to_aug)
