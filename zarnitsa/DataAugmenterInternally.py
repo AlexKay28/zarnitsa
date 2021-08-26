@@ -9,8 +9,16 @@ from .DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterInternally(AbstractDataAugmenter):
-    def __init__(self, n_jobs=1):
+    __available_imputers = ["simple", "knn"]
+
+    def __init__(self, imputer_name=None, n_jobs=1):
+        self.imputer_name = imputer_name
         self.n_jobs = n_jobs
+
+        # this variables can be configured manually
+        self.imputer_n_neighbors = 3
+        self.missig_values = np.nan
+        self.imputer_strategy = "mean"
 
     def augment_dataframe(
         self, df: pd.DataFrame, aug_type="permutations", **kwargs
@@ -55,6 +63,24 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         to_aug = augment_column_method[aug_type](col, **kwargs)
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
+    def _apply_imputation_knn(self, data):
+        if self.imputer_name == "simple":
+            imputer = SimpleImputer(
+                missing_values=self.missig_values, strategy=self.imputer_strategy
+            )
+            data = imputer.fit_transform(data)
+        elif self.imputer_name == "knn":
+            imputer = KNNImputer(n_neighbors=self.imputer_n_neighbors)
+            data = imputer.fit_transform(data)
+        else:
+            raise KeyError(
+                f"""
+                Unknown imputer name <{self.imputer_name}>.
+                Choose from {','.join(self.__available_imputers)}
+                """
+            )
+        return data
+
     def _prepare_data_to_aug(self, data, freq=0.2) -> Tuple[pd.Series, pd.Series]:
         """
         Get part of data. Not augment all of it excep case freq=1.0
@@ -62,6 +88,9 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: freq: part of the data which will be the base for augmentation
         """
         data = pd.Series(data) if not isinstance(data, pd.Series) else data
+        if self.imputer_name:
+            data = self._apply_imputation_knn(data)
+
         if freq < 1:
             not_to_aug, to_aug = train_test_split(data, test_size=freq)
             return not_to_aug, to_aug
