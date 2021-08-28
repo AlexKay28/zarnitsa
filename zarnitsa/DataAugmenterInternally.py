@@ -76,7 +76,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         else:
             raise KeyError(
                 f"Unknown imputer name <{self.imputer_name}>. "
-                f"Choose from {','.join(self.__available_imputers)}"
+                f"Choose from: {','.join(self.__available_imputers)}."
             )
         return data
 
