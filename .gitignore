@@ -6,3 +6,4 @@ build/
 dist/
 zarnitsa.egg-info/
 zarnitsa/demo/
+venv/
