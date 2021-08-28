@@ -3,9 +3,10 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
+from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 
-from .DataAugmenter import AbstractDataAugmenter
+from DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterInternally(AbstractDataAugmenter):
@@ -17,7 +18,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
 
         # this variables can be configured manually
         self.imputer_n_neighbors = 3
-        self.missig_values = np.nan
+        self.missing_values = np.nan
         self.imputer_strategy = "mean"
 
     def augment_dataframe(
@@ -41,7 +42,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         kwargs["freq"] = 1.0
         for col in df.columns:
             to_aug[col] = augment_column_method[aug_type](to_aug[col], **kwargs)
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+        return to_aug
 
     def augment_column(
         self, col: pd.Series, aug_type="permutations", **kwargs
@@ -61,12 +62,12 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             "permutations": self.augment_column_permut,
         }
         to_aug = augment_column_method[aug_type](col, **kwargs)
-        return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
+        return to_aug
 
-    def _apply_imputation_knn(self, data):
+    def _apply_imputation(self, data):
         if self.imputer_name == "simple":
             imputer = SimpleImputer(
-                missing_values=self.missig_values, strategy=self.imputer_strategy
+                missing_values=self.missing_values, strategy=self.imputer_strategy
             )
             data = imputer.fit_transform(data)
         elif self.imputer_name == "knn":
@@ -83,13 +84,15 @@ class DataAugmenterInternally(AbstractDataAugmenter):
 
     def _prepare_data_to_aug(self, data, freq=0.2) -> Tuple[pd.Series, pd.Series]:
         """
-        Get part of data. Not augment all of it excep case freq=1.0
+        Get part of data. Not augment all of it except case freq=1.0
         param: data: iterable data or pd.Series object
         param: freq: part of the data which will be the base for augmentation
         """
-        data = pd.Series(data) if not isinstance(data, pd.Series) else data
+        data = (
+            pd.Series(data) if not isinstance(data, (pd.DataFrame, pd.Series)) else data
+        )
         if self.imputer_name:
-            data = self._apply_imputation_knn(data)
+            data = self._apply_imputation(data)
 
         if freq < 1:
             not_to_aug, to_aug = train_test_split(data, test_size=freq)
