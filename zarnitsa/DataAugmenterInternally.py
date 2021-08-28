@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
-from sklearn.impute import KNNImputer
+from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.model_selection import train_test_split
 
 from DataAugmenter import AbstractDataAugmenter
@@ -12,7 +12,7 @@ from DataAugmenter import AbstractDataAugmenter
 class DataAugmenterInternally(AbstractDataAugmenter):
     __available_imputers = ["simple", "knn"]
 
-    def __init__(self, imputer_name=None, n_jobs=1):
+    def __init__(self, imputer_name="simple", n_jobs=1):
         self.imputer_name = imputer_name
         self.n_jobs = n_jobs
 
@@ -75,10 +75,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             data = imputer.fit_transform(data)
         else:
             raise KeyError(
-                f"""
-                Unknown imputer name <{self.imputer_name}>.
-                Choose from {','.join(self.__available_imputers)}
-                """
+                f"Unknown imputer name <{self.imputer_name}>. "
+                f"Choose from {','.join(self.__available_imputers)}"
             )
         return data
 
