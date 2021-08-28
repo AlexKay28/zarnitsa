@@ -5,7 +5,7 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split
 
-from .DataAugmenter import AbstractDataAugmenter
+from DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterInternally(AbstractDataAugmenter):
@@ -71,7 +71,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
             return data, data.sample(0)
 
     def augment_column_permut(
-        self, col: pd.Series, n_to_aug=None, freq=0.2, return_only_aug=False
+        self, col: pd.Series, n_to_aug=0, freq=0.2, return_only_aug=False
     ) -> pd.Series:
         """
         Augment column data using permutations. Pandas column
@@ -80,17 +80,20 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: freq: part of the data which will be the base for augmentation
         param: return_only_aug: ask return only augmented data
         """
+        if len(col) == 0:
+            raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
+        if n_to_aug == 0 and not return_only_aug:
+            return col
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         indices_to_permute = to_aug.index
         to_aug = to_aug.sample(frac=1.0)
         to_aug.index = indices_to_permute
-        if n_to_aug:
-            n_to_aug = n_to_aug if n_to_aug < to_aug.shape[0] else to_aug.shape[0]
-            to_aug = to_aug.sample(n_to_aug)
+        n_to_aug = n_to_aug if n_to_aug < to_aug.shape[0] else to_aug.shape[0]
+        to_aug = to_aug.sample(n_to_aug)
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def augment_column_norm(
-        self, col: pd.Series, n_to_aug=None, freq=0.2, n_sigm=3, return_only_aug=False
+        self, col: pd.Series, n_to_aug=0, freq=0.2, n_sigm=3, return_only_aug=False
     ) -> pd.Series:
         """
         Augment column data using normal distribution. Pandas column
@@ -100,6 +103,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: n_sigm: the size of std and terms of sigma value
         param: return_only_aug: ask return only augmented data
         """
+        if len(col) == 0:
+            raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         column_std = col.std()
         to_aug = to_aug.apply(
@@ -111,7 +116,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def augment_column_uniform(
-        self, col: pd.Series, n_to_aug=None, freq=0.2, n_sigm=3, return_only_aug=False
+        self, col: pd.Series, n_to_aug=0, freq=0.2, n_sigm=3, return_only_aug=False
     ) -> pd.Series:
         """
         Augment column data using uniform distribution. Pandas column
@@ -121,6 +126,8 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: n_sigm: the size of std and terms of sigma value
         param: return_only_aug: ask return only augmented data
         """
+        if len(col) == 0:
+            raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
         column_std = col.std()
         to_aug = to_aug.apply(
