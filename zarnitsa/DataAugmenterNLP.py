@@ -10,7 +10,7 @@ import nlpaug.augmenter.word as naw
 
 from sklearn.model_selection import train_test_split
 
-from .DataAugmenter import AbstractDataAugmenter
+from DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterNLP(AbstractDataAugmenter):
@@ -118,6 +118,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
     def augment_wordnet(self, text: str) -> str:
         """Augment column data using wordnet synset."""
+        if not text:
+            return ""
         if not self.__aug_wdnt:
             print("Load WordNet synset")
             self.__aug_wdnt = naw.SynonymAug(aug_src="wordnet")
@@ -126,6 +128,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
     def augment_ppdb(self, text: str) -> str:
         """Augment column data using ppdb synset."""
+        if not text:
+            return ""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
@@ -148,6 +152,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         topn=5,
     ) -> str:
         """Augment column data using embeddings."""
+        if not text:
+            return ""
         if not nlp:
             if not vocab_name:
                 print("Use spacy en_core_web_sm vocab!")
@@ -197,6 +203,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
     @staticmethod
     def augment_del(text: str, reps=1, min_words=1) -> str:
         """Augment column data using deleting."""
+        if not text:
+            return ""
         text = text.split()
         for _ in range(reps):
             text_len = len(text)
@@ -209,6 +217,8 @@ class DataAugmenterNLP(AbstractDataAugmenter):
     @staticmethod
     def augment_permut(text: str, reps=1, window_size=3) -> str:
         """Augment column data using permutations."""
+        if not text:
+            return ""
         text = text.split()
         text_len = len(text)
         for _ in range(reps):
