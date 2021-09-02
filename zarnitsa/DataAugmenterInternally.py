@@ -70,7 +70,7 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         elif freq == 0:
             return data, data.sample(0)
         else:
-            raise  ValueError("freq value not in [0, 1] span")
+            raise ValueError("freq value not in [0, 1] span")
 
     def augment_column_permut(
         self, col: pd.Series, n_to_aug=0, freq=0.2, return_only_aug=False

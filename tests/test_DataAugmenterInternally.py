@@ -54,13 +54,25 @@ def test_augment_column_permut(dataug_internally):
     pd_series = pd.Series(
         np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
-    pd_series_aug = dataug_internally.augment_column_norm(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).statistic < 1e-3
+    pd_series_aug = dataug_internally.augment_column_permut(pd_series, freq=0)
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
+
+    sig = 1
+    pd_series = pd.Series(
+        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
+    )
+    pd_series_aug = dataug_internally.augment_column_permut(
+        pd_series,
+        freq=1.0,
+        n_to_aug=pd_series.shape[0],
+        return_only_aug=True,
+    )
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
 
 def test_augment_column_norm(dataug_internally):
     """
-    Augment column with normal distribution
+    Test case: Augment column with normal distribution
     """
     pd_series = pd.Series([], dtype="float64")
     try:
@@ -74,10 +86,10 @@ def test_augment_column_norm(dataug_internally):
         np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
     pd_series_aug = dataug_internally.augment_column_norm(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.5
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
     sig = 1
-    n_sig = 0.5
+    n_sig = 0.33
     pd_series = pd.Series(
         np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
@@ -88,7 +100,7 @@ def test_augment_column_norm(dataug_internally):
         n_to_aug=pd_series.shape[0],
         return_only_aug=True,
     )
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.5
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.4, "KS criteria"
 
     sig = 1
     pd_series = pd.Series(
@@ -98,12 +110,12 @@ def test_augment_column_norm(dataug_internally):
         np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
     pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=1.0)
-    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-20
+    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-15, "KS criteria"
 
 
 def test_augment_column_uniform(dataug_internally):
     """
-    Augment column with uniform distribution
+    Test case: Augment column with uniform distribution
     """
     pd_series = pd.Series([], dtype="float64")
     try:
@@ -117,10 +129,10 @@ def test_augment_column_uniform(dataug_internally):
         np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
     pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.5
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
     sig = 1
-    n_sig = 0.5
+    n_sig = 0.33
     pd_series = pd.Series(
         np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
     )
@@ -131,7 +143,7 @@ def test_augment_column_uniform(dataug_internally):
         n_to_aug=pd_series.shape[0],
         return_only_aug=True,
     )
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.5
+    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.4, "KS criteria"
 
     sig = 1
     pd_series = pd.Series(
@@ -141,4 +153,4 @@ def test_augment_column_uniform(dataug_internally):
         np.random.normal(0, 3 * sig, size=N_TO_CHECK), dtype="float64"
     )
     pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=1.0)
-    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-20
+    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-15, "KS criteria"
