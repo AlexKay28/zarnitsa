@@ -62,13 +62,15 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         param: freq: part of the data which will be the base for augmentation
         """
         data = pd.Series(data) if not isinstance(data, pd.Series) else data
-        if freq < 1:
+        if 0 < freq < 1:
             not_to_aug, to_aug = train_test_split(data, test_size=freq)
             return not_to_aug, to_aug
         elif freq == 1:
             return data.sample(0), data
         elif freq == 0:
             return data, data.sample(0)
+        else:
+            raise  ValueError("freq value not in [0, 1] span")
 
     def augment_column_permut(
         self, col: pd.Series, n_to_aug=0, freq=0.2, return_only_aug=False
