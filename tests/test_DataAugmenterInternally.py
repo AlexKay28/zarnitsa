@@ -8,7 +8,7 @@ from scipy.stats import ks_2samp
 
 sys.path.append("zarnitsa/")
 
-from DataAugmenterInternally import DataAugmenterInternally
+from stats.DataAugmenterInternally import DataAugmenterInternally
 
 """
 Under the null hypothesis the two distributions are identical.

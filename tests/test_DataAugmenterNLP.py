@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("zarnitsa/")
 
-from DataAugmenterNLP import DataAugmenterNLP
+from nlp.DataAugmenterNLP import DataAugmenterNLP
 
 
 @pytest.fixture

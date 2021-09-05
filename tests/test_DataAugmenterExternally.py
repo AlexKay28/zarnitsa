@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("zarnitsa/")
 
-from DataAugmenterInternally import DataAugmenterInternally
+from stats.DataAugmenterInternally import DataAugmenterInternally
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import nlpaug.augmenter.word as naw
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split as splitting
 
 from DataAugmenter import AbstractDataAugmenter
 
@@ -30,7 +30,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             else data
         )
         if 0 < freq < 1:
-            not_to_aug, to_aug = train_test_split(data, test_size=freq)
+            not_to_aug, to_aug = splitting(data, test_size=freq)
             return not_to_aug, to_aug
         elif freq == 1:
             return data.sample(0), data
