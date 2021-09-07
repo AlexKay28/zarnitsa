@@ -1,66 +1,35 @@
 import os
+import sys
 import pytest
+import numpy as np
 import pandas as pd
 
-import sys
+from scipy.stats import ks_2samp
 
 sys.path.append("zarnitsa/")
 
-from DataAugmenterInternally import DataAugmenterInternally
+from DataAugmenterExternally import DataAugmenterExternally
+
+
+N_TO_CHECK = 500
+SIG = 0.5
 
 
 @pytest.fixture
-def dataug_internally():
-    return DataAugmenterInternally()
+def dae():
+    return DataAugmenterExternally()
 
 
-def test_augment_column_permute(dataug_internally):
+@pytest.fixture
+def normal_data():
+    return pd.Series(np.random.normal(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
+
+
+def test_augment_column_permute(dae, normal_data):
     """
-    Test permutation approach for augmentation for pandas series
-    (or any other iterable) variable
+    Augment column with normal distribution
     """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_permut(pd_series)
-        assert False, "ValueError wasnt throwed!"
-    except ValueError as e:
-        assert True
-
-    pd_series = pd.Series([0, 1, 2, 3, 4, 5])
-    # test non changed table outside
-    pd_series_test = dataug_internally.augment_column_permut(
-        pd_series, n_to_aug=0, return_only_aug=False
+    normal_data_aug = dae.augment_distrib_random(
+        aug_type="normal", size=N_TO_CHECK, loc=0, scale=SIG * 3
     )
-    assert (pd_series == pd_series_test).all(), "Assert return the same Series"
-
-    # test table with no returned values
-    pd_series_test = dataug_internally.augment_column_permut(
-        pd_series, n_to_aug=0, return_only_aug=True
-    )
-    assert (
-        pd.Series([], dtype="float64") == pd_series_test
-    ).all(), "Assert return empty table"
-
-
-def test_augment_column_norm(dataug_internally):
-    """
-    Tests for augmentation using normal distribution
-    """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_norm(pd_series)
-        assert False, "ValueError wasnt throwed!"
-    except ValueError as e:
-        assert True
-
-
-def test_augment_column_uniform(dataug_internally):
-    """
-    Tests for augmentation using normal distribution
-    """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_uniform(pd_series)
-        assert False, "ValueError wasnt throwed!"
-    except ValueError as e:
-        assert True
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.5, "KS criteria"

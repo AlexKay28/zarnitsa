@@ -174,7 +174,6 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             by_similarity = sorted(
                 queries, key=lambda w: word.similarity(w), reverse=True
             )
-            print([w.lower_ for w in by_similarity[:5]])
             # get candidates and with the same word shape
             candidates = []
             for w in by_similarity[: topn + 1]:
