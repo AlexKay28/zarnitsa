@@ -30,7 +30,7 @@ def dai():
 
 
 @pytest.fixture
-def emty_data():
+def empty_data():
     return pd.Series([], dtype="float64")
 
 
@@ -44,20 +44,20 @@ def uniform_data():
     return pd.Series(np.random.uniform(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
 
 
-def test_augment_column(dai, emty_data):
+def test_augment_column(dai, empty_data):
     """
     Augment column
     """
     with pytest.raises(ValueError):
-        dai.augment_column_norm(emty_data)
+        dai.augment_column_norm(empty_data)
 
 
-def test_augment_column_permut_er(dai, emty_data):
+def test_augment_column_permut_er(dai, empty_data):
     """
     Augment column with normal distribution
     """
     with pytest.raises(ValueError):
-        dai.augment_column_norm(emty_data)
+        dai.augment_column_norm(empty_data)
 
 
 def test_augment_column_permut_1(dai, normal_data):
@@ -75,13 +75,13 @@ def test_augment_column_permut_2(dai, normal_data):
     assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.95, "KS criteria"
 
 
-def test_augment_column_norm_er(dai, emty_data):
+def test_augment_column_norm_er(dai, empty_data):
     """
     Test case: Augment column with normal distribution
     """
     pd_series = pd.Series([], dtype="float64")
     with pytest.raises(ValueError):
-        dai.augment_column_norm(emty_data)
+        dai.augment_column_norm(empty_data)
 
 
 def test_augment_column_norm_1(dai, normal_data):
@@ -105,13 +105,13 @@ def test_augment_column_norm_3(dai, uniform_data):
     assert ks_2samp(uniform_data, normal_data_aug).pvalue < 1e-8, "KS criteria"
 
 
-def test_augment_column_uniform_er(dai, emty_data):
+def test_augment_column_uniform_er(dai, empty_data):
     """
     Test case: Augment column with uniform distribution
     """
     pd_series = pd.Series([], dtype="float64")
     with pytest.raises(ValueError):
-        dai.augment_column_norm(emty_data)
+        dai.augment_column_norm(empty_data)
 
 
 def test_augment_column_uniform_1(dai, uniform_data):

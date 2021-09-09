@@ -15,7 +15,7 @@ def dataug_nlp():
 
 
 @pytest.fixture
-def emty_text():
+def empty_text():
     return ""
 
 
@@ -24,12 +24,12 @@ def filled_text():
     return "one two three four five"
 
 
-def test_augment_del_1(dataug_nlp, emty_text):
+def test_augment_del_1(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_del(emty_text)
+    text_augmented = dataug_nlp.augment_del(empty_text)
     assert len(text_augmented) == 0
 
 
@@ -51,12 +51,12 @@ def test_augment_del_4(dataug_nlp, filled_text):
     assert len(text_augmented.split()) == 1
 
 
-def test_augment_permut_1(dataug_nlp, emty_text):
+def test_augment_permut_1(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_permut(emty_text)
+    text_augmented = dataug_nlp.augment_permut(empty_text)
     assert len(text_augmented) == 0
 
 
@@ -64,42 +64,42 @@ def test_augment_permut_2(dataug_nlp, filled_text):
     n_times_permut = 1
     text_augmented = dataug_nlp.augment_permut(filled_text, reps=n_times_permut)
     permutations = [
-        1 if f != s else 0 for f, s in zip(filled_text.split(), text_augmented.split())
+        int(f != s) for f, s in zip(filled_text.split(), text_augmented.split())
     ]
     assert sum(permutations) == 2
 
 
-def test_augment_wordnet(dataug_nlp, emty_text):
+def test_augment_wordnet(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_wordnet(emty_text)
+    text_augmented = dataug_nlp.augment_wordnet(empty_text)
     assert len(text_augmented) == 0
 
 
-def test_augment_ppdb(dataug_nlp, emty_text):
+def test_augment_ppdb(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_ppdb(emty_text)
+    text_augmented = dataug_nlp.augment_ppdb(empty_text)
     assert len(text_augmented) == 0
 
 
-def test_augment_emb_1(dataug_nlp, emty_text):
+def test_augment_emb_1(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_word_emb(emty_text)
+    text_augmented = dataug_nlp.augment_word_emb(empty_text)
 
 
 def test_augment_emb_2(dataug_nlp, filled_text):
     n_reps = 1
     text_augmented = dataug_nlp.augment_word_emb(filled_text, reps=n_reps)
     words_changed = [
-        1 if first != second else 0
+        int(first != second)
         for first, second in zip(filled_text.split(), text_augmented.split())
     ]
     assert sum(words_changed) == 1

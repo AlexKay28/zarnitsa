@@ -47,4 +47,8 @@ class DataAugmenterExternally(AbstractDataAugmenter):
 
     def augment_distrib_random(self, aug_type="normal", size=1, **kwargs):
         """Return float or array depends on needed size. If size is 1 - returns array of size 1"""
-        return eval(f"np.random.{aug_type}")(size=size, **kwargs)
+        np_func = getattr(np.random, aug_type, None)
+        if np_func:
+            return np_func(size=size, **kwargs)
+        else:
+            raise KeyError(f"Unknown aug type: <{aug_type}>")
