@@ -10,7 +10,7 @@ import nlpaug.augmenter.word as naw
 
 from sklearn.model_selection import train_test_split
 
-from .DataAugmenter import AbstractDataAugmenter
+from DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterNLP(AbstractDataAugmenter):
@@ -29,13 +29,15 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             if type(data) is not pd.Series and type(data) is not pd.DataFrame
             else data
         )
-        if freq < 1:
+        if 0 < freq < 1:
             not_to_aug, to_aug = train_test_split(data, test_size=freq)
             return not_to_aug, to_aug
         elif freq == 1:
             return data.sample(0), data
         elif freq == 0:
             return data, data.sample(0)
+        else:
+            raise ValueError("freq value not in [0, 1] span")
 
     def augment_dataframe(
         self,
@@ -117,7 +119,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             raise KeyError(f"Synset {name} is unknown! Load manually or fix the name")
 
     def augment_wordnet(self, text: str) -> str:
-        """Augment column data using wordnet synset."""
+        """Augment str data using wordnet synset."""
+        if not text:
+            return ""
         if not self.__aug_wdnt:
             print("Load WordNet synset")
             self.__aug_wdnt = naw.SynonymAug(aug_src="wordnet")
@@ -125,7 +129,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         return text
 
     def augment_ppdb(self, text: str) -> str:
-        """Augment column data using ppdb synset."""
+        """Augment str data using ppdb synset."""
+        if not text:
+            return ""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
@@ -147,7 +153,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         reps=1,
         topn=5,
     ) -> str:
-        """Augment column data using embeddings."""
+        """Augment str data using embeddings."""
+        if not text:
+            return ""
         if not nlp:
             if not vocab_name:
                 print("Use spacy en_core_web_sm vocab!")
@@ -166,18 +174,19 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             by_similarity = sorted(
                 queries, key=lambda w: word.similarity(w), reverse=True
             )
-
             # get candidates and with the same word shape
             candidates = []
             for w in by_similarity[: topn + 1]:
-                if w.lower_ == word.lower_:
+                word_orig = word.lower_
+                word_potential = w.lower_
+                if word_orig == word_potential:
                     # skip the same word
                     continue
                 if not word.lower_.islower() and not word.lower_.isupper():
                     # word should look like "Word"
-                    candidates.append(w.lower_.capitalize())
+                    candidates.append(word_potential.capitalize())
                 else:
-                    if word.islower():
+                    if word.lower_.islower():
                         # word should look like "word"
                         candidates.append(w.lower_)
                     else:
@@ -196,7 +205,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
     @staticmethod
     def augment_del(text: str, reps=1, min_words=1) -> str:
-        """Augment column data using deleting."""
+        """Augment str data using deleting."""
+        if not text:
+            return ""
         text = text.split()
         for _ in range(reps):
             text_len = len(text)
@@ -208,7 +219,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
 
     @staticmethod
     def augment_permut(text: str, reps=1, window_size=3) -> str:
-        """Augment column data using permutations."""
+        """Augment str data using permutations."""
+        if not text:
+            return ""
         text = text.split()
         text_len = len(text)
         for _ in range(reps):
