@@ -102,7 +102,7 @@ def test_augment_column_norm_2(dai, normal_data):
 
 def test_augment_column_norm_3(dai, uniform_data):
     normal_data_aug = dai.augment_column_norm(uniform_data, freq=1.0)
-    assert ks_2samp(uniform_data, normal_data_aug).pvalue < 1e-8, "KS criteria"
+    assert ks_2samp(uniform_data, normal_data_aug).pvalue < 1e-5, "KS criteria"
 
 
 def test_augment_column_uniform_er(dai, empty_data):
@@ -132,4 +132,4 @@ def test_augment_column_uniform_2(dai, uniform_data):
 
 def test_augment_column_uniform_3(dai, normal_data):
     uniform_data_aug = dai.augment_column_uniform(normal_data, freq=1.0)
-    assert ks_2samp(normal_data, uniform_data_aug).pvalue < 1e-8, "KS criteria"
+    assert ks_2samp(normal_data, uniform_data_aug).pvalue < 1e-5, "KS criteria"

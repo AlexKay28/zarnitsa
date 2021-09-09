@@ -32,4 +32,4 @@ def test_augment_column_permute(dae, normal_data):
     normal_data_aug = dae.augment_distrib_random(
         aug_type="normal", size=N_TO_CHECK, loc=0, scale=SIG * 3
     )
-    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.3, "KS criteria"
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.01, "KS criteria"
