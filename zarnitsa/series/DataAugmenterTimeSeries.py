@@ -99,7 +99,7 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
             poly = np.poly1d(np.polyfit(col.index, col.values, kwargs["order"]))
             indices_to_extrapolate = [
                 col.index[-1] + (h * (t + 1)) for t in range(limit)
-            ] # creeate N extra time steps here
+            ]  # creeate N extra time steps using indices
             col = col.append(
                 pd.Series(
                     data=poly(indices_to_extrapolate), index=indices_to_extrapolate
