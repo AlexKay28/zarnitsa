@@ -7,7 +7,6 @@ import pandas as pd
 from scipy.stats import ks_2samp
 
 sys.path.append("zarnitsa/")
-
 from stats.DataAugmenterInternally import DataAugmenterInternally
 
 """
@@ -20,137 +19,114 @@ Conversely, we can reject the null hypothesis if the p-value is low.
 """
 
 N_TO_CHECK = 500
+SIG = 3
+N_SIG = 0.33
 
 
 @pytest.fixture
-def dataug_internally():
+def dai():
     return DataAugmenterInternally()
 
 
-def test_augment_column(dataug_internally):
+@pytest.fixture
+def empty_data():
+    return pd.Series([], dtype="float64")
+
+
+@pytest.fixture
+def normal_data():
+    return pd.Series(np.random.normal(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
+
+
+@pytest.fixture
+def uniform_data():
+    return pd.Series(np.random.uniform(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
+
+
+def test_augment_column(dai, empty_data):
     """
     Augment column
     """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_norm(pd_series)
-        assert False, "ValueError was throwed!"
-    except ValueError as e:
-        assert True
+    with pytest.raises(ValueError):
+        dai.augment_column_norm(empty_data)
 
 
-def test_augment_column_permut(dataug_internally):
+def test_augment_column_permut_er(dai, empty_data):
     """
     Augment column with normal distribution
     """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_norm(pd_series)
-        assert False, "ValueError was throwed!"
-    except ValueError as e:
-        assert True
+    with pytest.raises(ValueError):
+        dai.augment_column_norm(empty_data)
 
-    sig = 1
-    pd_series = pd.Series(
-        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_permut(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
-    sig = 1
-    pd_series = pd.Series(
-        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_permut(
-        pd_series,
+def test_augment_column_permut_1(dai, normal_data):
+    normal_data_aug = dai.augment_column_permut(normal_data, freq=0)
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.95, "KS criteria"
+
+
+def test_augment_column_permut_2(dai, normal_data):
+    normal_data_aug = dai.augment_column_permut(
+        normal_data,
         freq=1.0,
-        n_to_aug=pd_series.shape[0],
+        n_to_aug=N_TO_CHECK,
         return_only_aug=True,
     )
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.95, "KS criteria"
 
 
-def test_augment_column_norm(dataug_internally):
+def test_augment_column_norm_er(dai, empty_data):
     """
     Test case: Augment column with normal distribution
     """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_norm(pd_series)
-        assert False, "ValueError was throwed!"
-    except ValueError as e:
-        assert True
+    with pytest.raises(ValueError):
+        dai.augment_column_norm(empty_data)
 
-    sig = 1
-    pd_series = pd.Series(
-        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_norm(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
-    sig = 1
-    n_sig = 0.33
-    pd_series = pd.Series(
-        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_norm(
-        pd_series,
+def test_augment_column_norm_1(dai, normal_data):
+    normal_data_aug = dai.augment_column_norm(normal_data, freq=0)
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.95, "KS criteria"
+
+
+def test_augment_column_norm_2(dai, normal_data):
+    normal_data_aug = dai.augment_column_norm(
+        normal_data,
         freq=1,
-        n_sigm=n_sig,
-        n_to_aug=pd_series.shape[0],
+        n_sigm=N_SIG,
+        n_to_aug=N_TO_CHECK,
         return_only_aug=True,
     )
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.4, "KS criteria"
-
-    sig = 1
-    pd_series = pd.Series(
-        np.random.normal(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_bad = pd.Series(
-        np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=1.0)
-    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-15, "KS criteria"
+    assert ks_2samp(normal_data, normal_data_aug).pvalue > 0.4, "KS criteria"
 
 
-def test_augment_column_uniform(dataug_internally):
+def test_augment_column_norm_3(dai, uniform_data):
+    normal_data_aug = dai.augment_column_norm(uniform_data, freq=1.0)
+    assert ks_2samp(uniform_data, normal_data_aug).pvalue < 1e-5, "KS criteria"
+
+
+def test_augment_column_uniform_er(dai, empty_data):
     """
     Test case: Augment column with uniform distribution
     """
-    pd_series = pd.Series([], dtype="float64")
-    try:
-        dataug_internally.augment_column_norm(pd_series)
-        assert False, "ValueError was throwed!"
-    except ValueError as e:
-        assert True
+    with pytest.raises(ValueError):
+        dai.augment_column_norm(empty_data)
 
-    sig = 1
-    pd_series = pd.Series(
-        np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=0)
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.95, "KS criteria"
 
-    sig = 1
-    n_sig = 0.33
-    pd_series = pd.Series(
-        np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_uniform(
-        pd_series,
+def test_augment_column_uniform_1(dai, uniform_data):
+    uniform_data_aug = dai.augment_column_uniform(uniform_data, freq=0)
+    assert ks_2samp(uniform_data, uniform_data_aug).pvalue > 0.95, "KS criteria"
+
+
+def test_augment_column_uniform_2(dai, uniform_data):
+    uniform_data_aug = dai.augment_column_uniform(
+        uniform_data,
         freq=1.0,
-        n_sigm=n_sig,
-        n_to_aug=pd_series.shape[0],
+        n_sigm=N_SIG,
+        n_to_aug=N_TO_CHECK,
         return_only_aug=True,
     )
-    assert ks_2samp(pd_series, pd_series_aug).pvalue > 0.4, "KS criteria"
+    assert ks_2samp(uniform_data, uniform_data_aug).pvalue > 0.4, "KS criteria"
 
-    sig = 1
-    pd_series = pd.Series(
-        np.random.uniform(0, sig * 3, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_bad = pd.Series(
-        np.random.normal(0, 3 * sig, size=N_TO_CHECK), dtype="float64"
-    )
-    pd_series_aug = dataug_internally.augment_column_uniform(pd_series, freq=1.0)
-    assert ks_2samp(pd_series_bad, pd_series_aug).pvalue < 1e-15, "KS criteria"
+
+def test_augment_column_uniform_3(dai, normal_data):
+    uniform_data_aug = dai.augment_column_uniform(normal_data, freq=1.0)
+    assert ks_2samp(normal_data, uniform_data_aug).pvalue < 1e-5, "KS criteria"

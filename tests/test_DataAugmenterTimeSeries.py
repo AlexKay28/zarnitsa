@@ -19,13 +19,13 @@ def dataug_time_series():
     return DataAugmenterTimeSeries()
 
 
-def test_data_droping(dataug_time_series):
+def test_data_dropping(dataug_time_series):
     """
-    data_droping
+    data_dropping
     """
     pd_series = pd.Series([], dtype="float64")
     try:
-        dataug_time_series.data_droping(pd_series)
+        dataug_time_series.data_dropping(pd_series)
         assert False, "ValueError was throwed!"
     except ValueError as e:
         assert True
@@ -35,19 +35,19 @@ def test_data_droping(dataug_time_series):
     pd_series = pd.Series(data=data, index=index, dtype="float64")
 
     freq = 0.5
-    new_pd_series = dataug_time_series.data_droping(pd_series, freq=freq)
+    new_pd_series = dataug_time_series.data_dropping(pd_series, freq=freq)
     assert pd_series.shape[0] * (1 - freq) == new_pd_series.shape[0]
 
     freq = 0.0
-    new_pd_series = dataug_time_series.data_droping(pd_series, freq=freq)
+    new_pd_series = dataug_time_series.data_dropping(pd_series, freq=freq)
     assert pd_series.shape[0] * (1 - freq) == new_pd_series.shape[0]
 
     freq = 1.0
-    new_pd_series = dataug_time_series.data_droping(pd_series, freq=freq)
+    new_pd_series = dataug_time_series.data_dropping(pd_series, freq=freq)
     assert pd_series.shape[0] * (1 - freq) == new_pd_series.shape[0]
 
     limit = 20
-    new_pd_series = dataug_time_series.data_droping(pd_series, limit=limit)
+    new_pd_series = dataug_time_series.data_dropping(pd_series, limit=limit)
     assert pd_series.shape[0] * (1 - 0.2) == new_pd_series.shape[0]
 
 

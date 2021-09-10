@@ -30,7 +30,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             else data
         )
         if 0 < freq < 1:
-            not_to_aug, to_aug = splitting(data, test_size=freq)
+            not_to_aug, to_aug = train_test_split(data, test_size=freq)
             return not_to_aug, to_aug
         elif freq == 1:
             return data.sample(0), data
@@ -174,7 +174,6 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             by_similarity = sorted(
                 queries, key=lambda w: word.similarity(w), reverse=True
             )
-            print([w.lower_ for w in by_similarity[:5]])
             # get candidates and with the same word shape
             candidates = []
             for w in by_similarity[: topn + 1]:

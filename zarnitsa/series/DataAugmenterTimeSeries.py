@@ -29,7 +29,7 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
     ) -> pd.Series:
         """Augment dataframe data. Pandas dataframe"""
         func = {
-            "dropping": self.data_droping,
+            "dropping": self.data_dropping,
             "data_interpolation": self.data_interpolation,
             "data_extrapolation": self.data_extrapolation,
             "data_denoiser": self.data_denoiser,
@@ -41,7 +41,7 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         pass
 
     @staticmethod
-    def data_droping(col, limit=None, freq=0.2, **kwargs) -> pd.Series:
+    def data_dropping(col, limit=None, freq=0.2, **kwargs) -> pd.Series:
         """
         Extrapolate pandas column
         """
