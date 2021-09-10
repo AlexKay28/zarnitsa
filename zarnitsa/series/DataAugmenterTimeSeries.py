@@ -107,7 +107,6 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
             )
         else:
             raise KeyError(f"Undefined method <{method}>!")
-
         return col
 
     @staticmethod
@@ -133,7 +132,6 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
             )
         else:
             raise KeyError(f"Undefined method '{method}'!")
-
         return col
 
     @staticmethod
@@ -154,5 +152,4 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
             col.loc[target_to_noize.index] = target_to_noize.values + noise
         else:
             raise KeyError(f"Undefined method <{method}>!")
-
         return col
