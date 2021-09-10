@@ -74,8 +74,7 @@ def test_augment_wordnet(dataug_nlp, empty_text):
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_to_aug = ""
-    text_augmented = dataug_nlp.augment_wordnet(text_to_aug)
+    text_augmented = dataug_nlp.augment_wordnet(empty_text)
     assert len(text_augmented) == 0
 
 
@@ -84,7 +83,6 @@ def test_augment_ppdb(dataug_nlp, empty_text):
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    empty_text = ""
     text_augmented = dataug_nlp.augment_ppdb(empty_text)
     assert len(text_augmented) == 0
 
@@ -94,7 +92,7 @@ def test_augment_emb_1(dataug_nlp, empty_text):
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
-    text_augmented = dataug_nlp.augment_ppdb(empty_text)
+    text_augmented = dataug_nlp.augment_word_emb(empty_text)
     assert len(text_augmented) == 0
 
 

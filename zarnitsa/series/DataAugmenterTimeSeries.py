@@ -45,7 +45,7 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         """
         Extrapolate pandas column
         """
-        if len(col) == 0:
+        if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         if limit:
             freq = limit / col.shape[0]
@@ -60,20 +60,18 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         Interpolate pandas column
         filling the gaps
         """
-        if len(col) == 0:
+        if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
-
+        if not col[col.isna()].shape[0]:
+            return col
         if limit is None:
             limit = int(col[col.isna()].shape[0] * freq)
 
-        if method in ["fillna"]:
+        if method in ("fillna"):
             col = col.fillna(kwargs["value_to_fill"], limit=limit)
-        elif method in ["linear", "pad", "polynomial"]:
-            indices = col.index
-            col = col.reset_index(drop=True)
+        elif method in ("linear", "pad", "polynomial"):
             col = col.interpolate(method=method, limit=limit, **kwargs)
-            col.index = indices
-        elif method in ["polyfit"]:
+        elif method in ("polyfit"):
             non_missed, missed = col[~col.isna()], col[col.isna()]
             poly = np.poly1d(np.polyfit(non_missed.index, non_missed.values, order))
             na_records = missed.sample(frac=limit / missed.shape[0])
@@ -90,19 +88,18 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         """
         Extrapolate pandas column
         """
-        if len(col) == 0:
+        if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         if limit is None:
             limit = int(col[col.isna()].shape[0] * freq)
-
         if h is None:
             h = (max(col.index) - min(col.index)) / col.shape[0]
 
-        if method in ["polyfit"]:
+        if method in ("polyfit"):
             poly = np.poly1d(np.polyfit(col.index, col.values, kwargs["order"]))
             indices_to_extrapolate = [
                 col.index[-1] + (h * (t + 1)) for t in range(limit)
-            ]
+            ] # creeate N extra time steps here
             col = col.append(
                 pd.Series(
                     data=poly(indices_to_extrapolate), index=indices_to_extrapolate
@@ -118,7 +115,7 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         """
         Denoise pandas column
         """
-        if len(col) == 0:
+        if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         if method == "lfilter":
             numerator = kwargs["numerator"]
@@ -144,14 +141,16 @@ class DataAugmenterTimeSeries(AbstractDataAugmenter):
         """
         Noise pandas column
         """
-        if len(col) == 0:
+        if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         if limit is None:
             limit = int(col[col.isna()].shape[0] * freq)
 
-        if method in ["normal"]:
+        if method in ("normal"):
             target_to_noize = col.sample(frac=limit / col.shape[0])
-            noise = np.random.normal(kwargs["mean"], kwargs["sig"], target_to_noize.shape[0])
+            noise = np.random.normal(
+                kwargs["mean"], kwargs["sig"], target_to_noize.shape[0]
+            )
             col.loc[target_to_noize.index] = target_to_noize.values + noise
         else:
             raise KeyError(f"Undefined method <{method}>!")
