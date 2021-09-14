@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("zarnitsa/")
 
-from DataAugmenterNLP import DataAugmenterNLP
+from nlp.DataAugmenterNLP import DataAugmenterNLP
 
 
 @pytest.fixture
@@ -93,6 +93,7 @@ def test_augment_emb_1(dataug_nlp, empty_text):
     (or any other iterable) variable
     """
     text_augmented = dataug_nlp.augment_word_emb(empty_text)
+    assert len(text_augmented) == 0
 
 
 def test_augment_emb_2(dataug_nlp, filled_text):

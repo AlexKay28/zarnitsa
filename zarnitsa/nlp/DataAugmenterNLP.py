@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import nlpaug.augmenter.word as naw
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split as splitting
 
 from DataAugmenter import AbstractDataAugmenter
 

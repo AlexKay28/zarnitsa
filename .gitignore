@@ -8,3 +8,4 @@ dist/
 zarnitsa.egg-info/
 zarnitsa/demo/
 venv/
+*.pyc

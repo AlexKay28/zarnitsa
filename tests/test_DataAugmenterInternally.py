@@ -7,8 +7,7 @@ import pandas as pd
 from scipy.stats import ks_2samp
 
 sys.path.append("zarnitsa/")
-
-from DataAugmenterInternally import DataAugmenterInternally
+from stats.DataAugmenterInternally import DataAugmenterInternally
 
 """
 Under the null hypothesis the two distributions are identical.
@@ -79,7 +78,6 @@ def test_augment_column_norm_er(dai, empty_data):
     """
     Test case: Augment column with normal distribution
     """
-    pd_series = pd.Series([], dtype="float64")
     with pytest.raises(ValueError):
         dai.augment_column_norm(empty_data)
 
@@ -109,7 +107,6 @@ def test_augment_column_uniform_er(dai, empty_data):
     """
     Test case: Augment column with uniform distribution
     """
-    pd_series = pd.Series([], dtype="float64")
     with pytest.raises(ValueError):
         dai.augment_column_norm(empty_data)
 
