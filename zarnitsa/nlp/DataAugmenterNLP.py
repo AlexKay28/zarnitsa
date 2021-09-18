@@ -128,16 +128,21 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         text = self.__aug_wdnt.augment(text)
         return text
 
-    def augment_ppdb(self, text: str) -> str:
+    def augment_ppdb(self, text: str, synset_path: str = None) -> str:
         """Augment str data using ppdb synset."""
         if not text:
             return ""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
             self._check_synset("ppdb")
-            ppdb_file_path = os.path.join(
-                self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
-            )
+            if not synset_path:
+                ppdb_file_path = os.path.join(
+                    self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
+                )
+            if not os.path.exists(ppdb_file_path):
+                raise IOError(
+                    f"Model {ppdb_file_path} doesnt exists! Choose something here: http://paraphrase.org/#/download"
+                )
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
                 model_path=ppdb_file_path,
