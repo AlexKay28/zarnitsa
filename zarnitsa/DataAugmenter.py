@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
-from typing import Tuple
-
 import pandas as pd
+from typing import Tuple
+from abc import ABCMeta, abstractmethod
+
 
 
 class AbstractDataAugmenter(metaclass=ABCMeta):
