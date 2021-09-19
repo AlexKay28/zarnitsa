@@ -109,22 +109,20 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             raise KeyError(f"Unknown type of NLP augmentation! [{aug_type}]")
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
-    def _check_synset(self, name, synset_path):
+    def _check_synset(self, name, synset_name, synset_path):
         """Check synset installed"""
         if os.path.exists(synset_path):
-            print(f"Synset {name} is already downloaded!")
+            print(f"Synset \"{synset_name}\" is already downloaded!")
             return 0
         else:
             if name == "ppdb":
                 print(f"Downloading {name} synset")
                 wget.download(
-                    # "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz",
-                    # "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-s-phrasal.gz",
-                    "http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-m-lexical.gz",
+                    f"http://nlpgrid.seas.upenn.edu/PPDB/eng/{synset_name}.gz",
                     synset_path + ".gz",
                 )
                 print("Prepare file..")
-                with gzip.open(synset_path+ ".gz", "rb") as f_in:
+                with gzip.open(synset_path + ".gz", "rb") as f_in:
                     with open(synset_path, "wb") as f_out:
                         shutil.copyfileobj(f_in, f_out)
             return 0
@@ -147,7 +145,12 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         text = self.__aug_wdnt.augment(text)
         return text
 
-    def augment_ppdb(self, text: str, synset_path: str = None) -> str:
+    def augment_ppdb(
+        self,
+        text: str,
+        synset_name: str = "ppdb-2.0-m-lexical",
+        synset_path: str = None,
+    ) -> str:
         """Augment str data using ppdb synset."""
         if not text:
             return ""
@@ -155,9 +158,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             print("Load PPDB synset")
             if not synset_path:
                 synset_path = os.path.join(
-                    self.__class_local_path, "synsets_data", "ppdb-2.0-m-lexical"
+                    self.__class_local_path, "synsets_data", synset_name
                 )
-                self._check_synset("ppdb", synset_path)
+                self._check_synset("ppdb", synset_name, synset_path)
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
                 model_path=synset_path,

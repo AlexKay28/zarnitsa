@@ -21,7 +21,12 @@ def empty_text():
 
 @pytest.fixture
 def filled_text():
-    return "This is an awesome text I have to augment here while testingt"
+    t = (
+        "This is an awesome text I have to augment here "
+        "while testing where at least one word "
+        "should be replaced by its synonim."
+    )
+    return t
 
 
 def test_augment_del_1(dataug_nlp, empty_text):
