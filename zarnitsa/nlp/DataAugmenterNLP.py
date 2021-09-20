@@ -11,7 +11,7 @@ import nlpaug.augmenter.word as naw
 
 from sklearn.model_selection import train_test_split as splitting
 
-from DataAugmenter import AbstractDataAugmenter
+from zarnitsa.DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterNLP(AbstractDataAugmenter):

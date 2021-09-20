@@ -1,6 +1,6 @@
-from DataAugmenter import AbstractDataAugmenter
+from zarnitsa.DataAugmenter import AbstractDataAugmenter
 
-from .nlp.DataAugmenterNLP import DataAugmenterNLP
-from .stats.DataAugmenterInternally import DataAugmenterInternally
-from .stats.DataAugmenterExternally import DataAugmenterExternally
-from .series.DataAugmenterTimeSeries import DataAugmenterTimeSeries
+from zarnitsa.nlp.DataAugmenterNLP import DataAugmenterNLP
+from zarnitsa.stats.DataAugmenterInternally import DataAugmenterInternally
+from zarnitsa.stats.DataAugmenterExternally import DataAugmenterExternally
+from zarnitsa.series.DataAugmenterTimeSeries import DataAugmenterTimeSeries
