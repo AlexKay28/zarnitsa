@@ -1,5 +1,6 @@
 import os
-
+import gzip
+import shutil
 from typing import Tuple
 
 import wget
@@ -10,7 +11,7 @@ import nlpaug.augmenter.word as naw
 
 from sklearn.model_selection import train_test_split as splitting
 
-from DataAugmenter import AbstractDataAugmenter
+from zarnitsa.DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterNLP(AbstractDataAugmenter):
@@ -108,15 +109,31 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             raise KeyError(f"Unknown type of NLP augmentation! [{aug_type}]")
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
-    def _check_synset(self, name):
+    def _check_synset(self, name, synset_name, synset_path):
         """Check synset installed"""
-        if name == "ppdb":
-            my_file = os.path.join(
-                self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
-            )  # todo: defined but not used
-            wget.download("http://nlpgrid.seas.upenn.edu/PPDB/eng/ppdb-2.0-tldr.gz")
+        if os.path.exists(synset_path):
+            print(f"Synset \"{synset_name}\" is already downloaded!")
+            return 0
         else:
-            raise KeyError(f"Synset {name} is unknown! Load manually or fix the name")
+            if name == "ppdb":
+                print(f"Downloading {name} synset")
+                wget.download(
+                    f"http://nlpgrid.seas.upenn.edu/PPDB/eng/{synset_name}.gz",
+                    synset_path + ".gz",
+                )
+                print("Prepare file..")
+                with gzip.open(synset_path + ".gz", "rb") as f_in:
+                    with open(synset_path, "wb") as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+            return 0
+        raise Exception(
+            f"""
+            Synset {name} is unknown! Load manually or fix the name
+            Choose something here:
+                - http://nlpgrid.seas.upenn.edu/PPDB/eng/
+                - http://paraphrase.org/#/download
+            """
+        )
 
     def augment_wordnet(self, text: str) -> str:
         """Augment str data using wordnet synset."""
@@ -128,19 +145,25 @@ class DataAugmenterNLP(AbstractDataAugmenter):
         text = self.__aug_wdnt.augment(text)
         return text
 
-    def augment_ppdb(self, text: str) -> str:
+    def augment_ppdb(
+        self,
+        text: str,
+        synset_name: str = "ppdb-2.0-m-lexical",
+        synset_path: str = None,
+    ) -> str:
         """Augment str data using ppdb synset."""
         if not text:
             return ""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
-            self._check_synset("ppdb")
-            ppdb_file_path = os.path.join(
-                self.__class_local_path, "internal_data", "ppdb-2.0-tldr"
-            )
+            if not synset_path:
+                synset_path = os.path.join(
+                    self.__class_local_path, "synsets_data", synset_name
+                )
+                self._check_synset("ppdb", synset_name, synset_path)
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
-                model_path=ppdb_file_path,
+                model_path=synset_path,
             )
         text = self.__aug_ppdb.augment(text)
         return text

@@ -21,7 +21,12 @@ def empty_text():
 
 @pytest.fixture
 def filled_text():
-    return "one two three four five"
+    t = (
+        "This is an awesome text I have to augment here "
+        "while testing where at least one word "
+        "should be replaced by its synonim."
+    )
+    return t
 
 
 def test_augment_del_1(dataug_nlp, empty_text):
@@ -69,7 +74,7 @@ def test_augment_permut_2(dataug_nlp, filled_text):
     assert sum(permutations) == 2
 
 
-def test_augment_wordnet(dataug_nlp, empty_text):
+def test_augment_wordnet_empty_text(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
@@ -78,13 +83,37 @@ def test_augment_wordnet(dataug_nlp, empty_text):
     assert len(text_augmented) == 0
 
 
-def test_augment_ppdb(dataug_nlp, empty_text):
+def test_augment_wordnet(dataug_nlp, filled_text):
+    """
+    Test permutation approach for augmentation for pandas series
+    (or any other iterable) variable
+    """
+    text_augmented = dataug_nlp.augment_wordnet(filled_text)
+    assert (
+        sum([1 for word in text_augmented.split() if word not in filled_text.split()])
+        >= 1
+    )
+
+
+def test_augment_ppdb_empty_text(dataug_nlp, empty_text):
     """
     Test permutation approach for augmentation for pandas series
     (or any other iterable) variable
     """
     text_augmented = dataug_nlp.augment_ppdb(empty_text)
     assert len(text_augmented) == 0
+
+
+def test_augment_ppdb(dataug_nlp, filled_text):
+    """
+    Test permutation approach for augmentation for pandas series
+    (or any other iterable) variable
+    """
+    text_augmented = dataug_nlp.augment_ppdb(filled_text)
+    assert (
+        sum([1 for word in text_augmented.split() if word not in filled_text.split()])
+        >= 1
+    )
 
 
 def test_augment_emb_1(dataug_nlp, empty_text):
