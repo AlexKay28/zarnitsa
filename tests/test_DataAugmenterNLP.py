@@ -4,9 +4,7 @@ import pandas as pd
 
 import sys
 
-sys.path.append("zarnitsa/")
-
-from nlp.DataAugmenterNLP import DataAugmenterNLP
+from zarnitsa.nlp import DataAugmenterNLP
 
 
 @pytest.fixture

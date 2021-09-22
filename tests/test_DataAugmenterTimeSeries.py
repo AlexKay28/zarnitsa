@@ -6,9 +6,7 @@ import pandas as pd
 
 from scipy.stats import ks_2samp
 
-sys.path.append("zarnitsa/")
-
-from series.DataAugmenterTimeSeries import DataAugmenterTimeSeries
+from zarnitsa.series import DataAugmenterTimeSeries
 
 
 N_TO_CHECK = 500

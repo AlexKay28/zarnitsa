@@ -8,7 +8,7 @@ from scipy.stats import ks_2samp
 
 sys.path.append("zarnitsa/")
 
-from stats.DataAugmenterExternally import DataAugmenterExternally
+from zarnitsa.stats import DataAugmenterExternally
 
 
 N_TO_CHECK = 500

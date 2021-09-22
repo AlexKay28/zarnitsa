@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.model_selection import train_test_split
 
-from zarnitsa.DataAugmenter import AbstractDataAugmenter
+from ..DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterInternally(AbstractDataAugmenter):

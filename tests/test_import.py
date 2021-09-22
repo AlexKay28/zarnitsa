@@ -13,7 +13,6 @@ def test_nlp_imports():
     from zarnitsa import nlp
     from zarnitsa.nlp import DataAugmenterNLP
 
-
 def test_stats_imports():
     from zarnitsa import stats
     from zarnitsa.stats import DataAugmenterExternally

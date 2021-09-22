@@ -11,12 +11,12 @@ install_requires = [
 
 setup(
     name="zarnitsa",
-    packages=find_packages(),
+    version="0.0.17",
     description="zarnitsa package for data augmentation",
-    version="0.0.15",
-    url="https://github.com/AlexKay28/zarnitsa",
     author="Kaigorodov Alexander",
     author_email="kaygorodo2305@gmail.com",
+    url="https://github.com/AlexKay28/zarnitsa",
+    packages=find_packages(),
     download_url="https://pypi.org/project/zarnitsa/",
     install_requires=install_requires,
     keywords=["augmentation", "NLP", "distributions"],

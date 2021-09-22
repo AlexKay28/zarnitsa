@@ -11,7 +11,7 @@ import nlpaug.augmenter.word as naw
 
 from sklearn.model_selection import train_test_split as splitting
 
-from zarnitsa.DataAugmenter import AbstractDataAugmenter
+from ..DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterNLP(AbstractDataAugmenter):
@@ -112,7 +112,7 @@ class DataAugmenterNLP(AbstractDataAugmenter):
     def _check_synset(self, name, synset_name, synset_path):
         """Check synset installed"""
         if os.path.exists(synset_path):
-            print(f"Synset \"{synset_name}\" is already downloaded!")
+            print(f'Synset "{synset_name}" is already downloaded!')
             return 0
         else:
             if name == "ppdb":

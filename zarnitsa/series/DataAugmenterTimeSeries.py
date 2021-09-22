@@ -5,7 +5,7 @@ from scipy.signal import lfilter, savgol_filter
 import numpy as np
 import pandas as pd
 
-from zarnitsa.DataAugmenter import AbstractDataAugmenter
+from ..DataAugmenter import AbstractDataAugmenter
 
 
 class DataAugmenterTimeSeries(AbstractDataAugmenter):
