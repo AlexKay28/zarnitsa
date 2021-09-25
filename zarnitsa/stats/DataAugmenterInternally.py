@@ -122,7 +122,14 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def augment_column_norm(
-        self, col: pd.Series, n_to_aug=0, freq=0.2, n_sigm=3, return_only_aug=False
+        self,
+        col: pd.Series,
+        mean=None,
+        sigm=None,
+        n_to_aug=0,
+        freq=0.2,
+        n_sigm=3,
+        return_only_aug=False,
     ) -> pd.Series:
         """
         Augment column data using normal distribution. Pandas column
@@ -135,9 +142,10 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-        column_std = col.std()
+        columns_mean = col.mean() if not mean else mean
+        column_std = col.std() if not sigm else sigm
         to_aug = to_aug.apply(
-            lambda value: np.random.normal(value, n_sigm * column_std)
+            lambda value: np.random.normal(columns_mean, n_sigm * column_std)
         )
         if n_to_aug:
             n_to_aug = min(n_to_aug, to_aug.shape[0])
@@ -145,7 +153,13 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         return to_aug if return_only_aug else pd.concat([not_to_aug, to_aug])
 
     def augment_column_uniform(
-        self, col: pd.Series, n_to_aug=0, freq=0.2, n_sigm=3, return_only_aug=False
+        self,
+        col: pd.Series,
+        min_=None,
+        max_=None,
+        n_to_aug=0,
+        freq=0.2,
+        return_only_aug=False,
     ) -> pd.Series:
         """
         Augment column data using uniform distribution. Pandas column
@@ -158,12 +172,9 @@ class DataAugmenterInternally(AbstractDataAugmenter):
         if not col.shape[0]:
             raise ValueError(f"Iterable object <{type(col)}> is empty! Check input!")
         not_to_aug, to_aug = self._prepare_data_to_aug(col, freq=freq)
-        column_std = col.std()
-        to_aug = to_aug.apply(
-            lambda value: np.random.uniform(
-                value - n_sigm * column_std, value + n_sigm * column_std
-            )
-        )
+        min_ = col.min() if not min_ else min_
+        max_ = col.max() if not max_ else max_
+        to_aug = to_aug.apply(lambda value: np.random.uniform(min_, max_))
         if n_to_aug:
             n_to_aug = min(n_to_aug, to_aug.shape[0])
             to_aug = to_aug.sample(n_to_aug)
