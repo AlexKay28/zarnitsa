@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 install_requires = [
     "numpy>=1.16.1",
     "pandas>=1.1.5",
-    "scikit-learn==0.24.1",
+    "scikit-learn>=0.23.2",
     "nlpaug==1.1.3",
     "wget>=3.2",
     "spacy>=3.0.5",
