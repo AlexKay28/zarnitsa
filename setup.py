@@ -11,7 +11,7 @@ install_requires = [
 
 setup(
     name="zarnitsa",
-    version="0.0.18",
+    version="0.0.19",
     description="zarnitsa package for data augmentation",
     author="Kaigorodov Alexander",
     author_email="kaygorodo2305@gmail.com",
