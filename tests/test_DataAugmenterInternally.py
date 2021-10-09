@@ -18,9 +18,12 @@ the two samples are the same.
 Conversely, we can reject the null hypothesis if the p-value is low.
 """
 
-N_TO_CHECK = 500
-SIG = 3
-N_SIG = 0.33
+np.random.seed(32)
+
+N_TO_CHECK = 200_000
+MEAN = 0
+SIG = 1
+N_SIG = 3
 
 
 @pytest.fixture
@@ -35,12 +38,16 @@ def empty_data():
 
 @pytest.fixture
 def normal_data():
-    return pd.Series(np.random.normal(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
+    return pd.Series(
+        np.random.normal(MEAN, SIG * N_SIG, size=N_TO_CHECK), dtype="float64"
+    )
 
 
 @pytest.fixture
 def uniform_data():
-    return pd.Series(np.random.uniform(0, SIG * 3, size=N_TO_CHECK), dtype="float64")
+    low = -SIG
+    high = SIG
+    return pd.Series(np.random.uniform(low, high, size=N_TO_CHECK))
 
 
 def test_augment_column(dai, empty_data):
@@ -91,6 +98,8 @@ def test_augment_column_norm_2(dai, normal_data):
     normal_data_aug = dai.augment_column_norm(
         normal_data,
         freq=1,
+        mean=MEAN,
+        sigm=SIG,
         n_sigm=N_SIG,
         n_to_aug=N_TO_CHECK,
         return_only_aug=True,
@@ -120,7 +129,8 @@ def test_augment_column_uniform_2(dai, uniform_data):
     uniform_data_aug = dai.augment_column_uniform(
         uniform_data,
         freq=1.0,
-        n_sigm=N_SIG,
+        min_=-SIG,
+        max_=SIG,
         n_to_aug=N_TO_CHECK,
         return_only_aug=True,
     )
