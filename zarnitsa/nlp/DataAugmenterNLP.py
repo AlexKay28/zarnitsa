@@ -17,11 +17,14 @@ from ..DataAugmenter import AbstractDataAugmenter
 class DataAugmenterNLP(AbstractDataAugmenter):
 
     __class_local_path = os.path.dirname(os.path.realpath(__file__))
+    __synsets_folder = os.path.join(__class_local_path, "synsets_data")
     __aug_wdnt = None
     __aug_ppdb = None
 
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
+        if not os.path.exists(self.__synsets_folder):
+            os.mkdir(self.__synsets_folder)
 
     def _prepare_data_to_aug(self, data, freq=0.2) -> Tuple[pd.Series, pd.Series]:
         """Get part of data. Not augment all of it excep case freq=1.0"""
@@ -156,10 +159,9 @@ class DataAugmenterNLP(AbstractDataAugmenter):
             return ""
         if not self.__aug_ppdb:
             print("Load PPDB synset")
+
             if not synset_path:
-                synset_path = os.path.join(
-                    self.__class_local_path, "synsets_data", synset_name
-                )
+                synset_path = os.path.join(self.__synsets_folder, synset_name)
                 self._check_synset("ppdb", synset_name, synset_path)
             self.__aug_ppdb = naw.SynonymAug(
                 aug_src="ppdb",
