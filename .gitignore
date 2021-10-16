@@ -1,4 +1,5 @@
 .ipynb_checkpoints
+.tox
 venv/
 */.ipynb_checkpoints/*
 .__pycache__
